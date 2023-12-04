@@ -47,12 +47,24 @@ export const POST = async (req: Request) => {
 }
 
 export const GET = async (req: NextRequest) => {
-    const header = req.headers
+    const userId = req.headers.get("user-id");
     const searchParams = req.nextUrl.searchParams
     const params = Object.fromEntries(searchParams)
     const jobs = await prisma.jobs.findMany({
         where: {
-            ...params
+            ...params,
+            ...(userId && {
+                OR: [
+                    {
+                        freelanceId: null
+                    },
+                    {
+                        freelanceId: {
+                            equals: userId
+                        }
+                    }
+                ]
+            })
         },
         select: {
             id: true,
@@ -63,6 +75,7 @@ export const GET = async (req: NextRequest) => {
             whatsapp: true,
             instagram: true,
             drive: true,
+            freelanceId: true,
             freelance: {
                 select: {
                     name: true
@@ -80,6 +93,5 @@ export const GET = async (req: NextRequest) => {
         }
     })
 
-    console.log(header)
     return NextResponse.json(data, { status: 200 });
 }

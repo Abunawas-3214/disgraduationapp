@@ -30,6 +30,7 @@ export const GET = async (req: Request, { params }: { params: { id: string } }) 
             whatsapp: true,
             instagram: true,
             drive: true,
+            freelanceId: true,
             freelance: {
                 select: {
                     name: true
@@ -38,7 +39,14 @@ export const GET = async (req: Request, { params }: { params: { id: string } }) 
             status: true
         }
     })
-    return NextResponse.json(job, { status: 200 });
+
+    const data = {
+        ...job,
+        campus: job?.campus?.name,
+        freelance: job?.freelance?.name ?? null
+    }
+
+    return NextResponse.json(data, { status: 200 });
 }
 
 export const POST = async (req: Request, { params }: { params: { id: string } }) => {
@@ -61,9 +69,10 @@ export const POST = async (req: Request, { params }: { params: { id: string } })
                 id: params.id
             },
             data: {
-                freelanceId: body.freelance
+                freelanceId: body.freelanceId
             }
         })
+        console.log(res)
         return NextResponse.json({ message: "This job has been taken" }, { status: 200 });
     }
     return NextResponse.json({ message: "This job no longer available" }, { status: 409 });

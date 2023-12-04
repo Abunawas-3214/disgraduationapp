@@ -5,9 +5,9 @@ import { Job } from "@/components/admin/jobs/schema"
 import { DataTableColumnHeader } from "@/components/admin/jobs/data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 
+import { FaGoogleDrive } from "react-icons/fa";
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
-import Image from "next/image"
 import AddGoogleDriveLink from "./add-gdrive-link"
 
 export const columns: ColumnDef<Job>[] = [
@@ -111,10 +111,10 @@ export const columns: ColumnDef<Job>[] = [
                             <Button
                                 variant="secondary"
                                 size="sm"
-                                className="flex items-center p-2 space-x-2"
+                                className="flex items-center p-2 space-x-2 "
                             >
                                 <span>Open</span>
-                                <Image src="/icons/google-drive.svg" alt="Google Drive" width={20} height={20} />
+                                <FaGoogleDrive />
                             </Button>
                         </a>
                         :
