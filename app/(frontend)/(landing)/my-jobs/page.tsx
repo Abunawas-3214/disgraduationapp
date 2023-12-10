@@ -29,7 +29,7 @@ export default async function MyJobs() {
 
     const curentJobs = jobs.filter((job: Job) => job.freelanceId === session?.user.id)
     return (
-        <div className="space-y-12">
+        <div className="space-y-12 py-24">
             <h1 className='text-3xl font-bold text-center'>Curent Jobs</h1>
 
             <div className="flex flex-wrap gap-8">

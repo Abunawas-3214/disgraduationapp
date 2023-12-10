@@ -53,6 +53,7 @@ import {
     CommandInput,
     CommandItem,
 } from "@/components/ui/command"
+import { Textarea } from "@/components/ui/textarea"
 
 const formSchema = z.object({
     name: z.string().min(1, {
@@ -72,6 +73,7 @@ export default function AddJob({ campuses }: { campuses: string[] }) {
     const [dialogOpen, setDialogOpen] = useState(false)
     const [isMutating, setIsMutating] = useState(false)
     const [campusSearch, setCampusSearch] = useState("")
+    const [generator, setGenerator] = useState("")
 
     const router = useRouter()
 
@@ -92,6 +94,44 @@ export default function AddJob({ campuses }: { campuses: string[] }) {
     const dirtyEachFields = () => {
         const field = Object.values(form.watch())
         return field.some(value => value === undefined || value === "")
+    }
+
+    const handleGenerate = async (e: SyntheticEvent) => {
+        e.preventDefault()
+
+        const namaRegex = /Nama : (\s*\w.*)/;
+        const namaKampusRegex = /Nama Kampus \/ Univ : (\w+)/;
+        const tanggalRegex = /Tanggal Wisuda : (\d{2}-\d{2}-\d{4})/;
+        const paketRegex = /Paket : (\w+)/;
+        const sesiRegex = /Sesi : Sesi (\d+)/;
+        const instagramRegex = /Instagram : @(\w+)/;
+
+        const namaMatch = generator.match(namaRegex);
+        const namaKampusMatch = generator.match(namaKampusRegex);
+        const tanggalMatch = generator.match(tanggalRegex);
+        const paketMatch = generator.match(paketRegex);
+        const sesiMatch = generator.match(sesiRegex);
+        const instagramMatch = generator.match(instagramRegex);
+
+        const namaValue = namaMatch ? namaMatch[1].trim() : null;
+        const namaKampusValue = namaKampusMatch ? namaKampusMatch[1] : null;
+        const tanggalValue = tanggalMatch ? new Date(tanggalMatch[1]) : null;
+        const paketValue = paketMatch ? paketMatch[1] : null;
+        const sesiValue = sesiMatch ? sesiMatch[1] : null;
+        const instagramValue = instagramMatch ? instagramMatch[1] : null;
+
+        console.log("Nama:", namaValue);
+        console.log("Nama Kampus:", namaKampusValue);
+        console.log("Tanggal Wisuda:", tanggalValue);
+        console.log("Paket:", paketValue);
+        console.log("Sesi:", sesiValue);
+        console.log("Instagram:", instagramValue);
+
+        form.setValue("name", namaValue ?? "")
+        form.setValue("campus", namaKampusValue ?? "")
+        form.setValue("date", tanggalValue ?? "")
+        form.setValue("session", sesiValue ?? "")
+        form.setValue("instagram", instagramValue ?? "")
     }
 
     const handleSubmit = async (e: SyntheticEvent) => {
@@ -124,6 +164,15 @@ export default function AddJob({ campuses }: { campuses: string[] }) {
                 <AlertDialogHeader>
                     <AlertDialogTitle className="text-xl font-bold">Add Job</AlertDialogTitle>
                 </AlertDialogHeader>
+
+                <div className="flex flex-col items-center gap-2">
+                    <Textarea placeholder="Input job template to generate" onChange={(e) => setGenerator(e.target.value)} />
+
+                    <Button className="w-fit" onClick={handleGenerate}>
+                        Generate
+                    </Button>
+                </div>
+
 
                 <Form {...form}>
                     <FormField

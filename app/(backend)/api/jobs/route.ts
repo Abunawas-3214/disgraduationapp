@@ -83,6 +83,9 @@ export const GET = async (req: NextRequest) => {
             },
             status: true
         },
+        orderBy: {
+            date: "asc"
+        }
     })
 
     const data = jobs.map((job) => {

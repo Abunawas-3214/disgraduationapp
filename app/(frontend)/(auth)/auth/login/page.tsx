@@ -24,8 +24,8 @@ const LoginPage = async () => {
                     Home
                 </Link>
                 <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-                    <div className="absolute inset-0 bg-zinc-900" />
-                    <div className="relative z-20 flex items-center text-lg font-medium">
+                    <div className="absolute inset-0 bg-primary" />
+                    <div className="relative z-20 flex items-center text-lg font-medium text-secondary">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
@@ -40,7 +40,7 @@ const LoginPage = async () => {
                         </svg>
                         DIS Graduation App
                     </div>
-                    <div className="relative z-20 mt-auto">
+                    <div className="relative z-20 mt-auto text-secondary">
                         <blockquote className="space-y-2">
                             <p className="text-lg">
                                 &ldquo;This library has saved me countless hours of work and

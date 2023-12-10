@@ -32,7 +32,6 @@ export default function DataTableRowActionComplete({ job }: { job: z.infer<typeo
         setIsMutating(true)
 
         const { data } = await axios.put(`http://localhost:3000/api/jobs/${job.id}`)
-        console.log(data)
 
         setIsMutating(false)
 

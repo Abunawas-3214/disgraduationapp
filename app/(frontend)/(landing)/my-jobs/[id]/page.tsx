@@ -5,6 +5,7 @@ import { Calendar, Clock, MapPin } from "lucide-react"
 import { format } from "date-fns"
 import Link from "next/link";
 import { Button } from "@/components/ui/button"
+import JobDoneAction from "@/components/jobs/job-done-action";
 
 
 interface Job {
@@ -27,7 +28,7 @@ export default async function JobDetails({ params }: { params: { id: string } })
 
 
     return (
-        <div className="space-y-12 flex flex-col items-center justify-center">
+        <div className="space-y-12 flex flex-col items-center justify-center py-24">
             <div className="text-center space-y-2">
                 <h1 className='text-5xl font-bold'>{job.name}</h1>
                 <h3 className="text-sm font-medium">{job.status}</h3>
@@ -68,13 +69,19 @@ export default async function JobDetails({ params }: { params: { id: string } })
                     />
                 </Link>
             </div>
-            <Button
-                size="lg"
-                disabled={job.status === "DONE"}
-                className={`w-52 ${!job.drive && "hover:cursor-not-allowed opacity-50"}`}
-            >
-                {job.status === "DONE" ? "This job is already done 👍" : "Set Job As Done"}
-            </Button>
+            <div className="flex flex-col items-center gap-4">
+                <JobDoneAction job={job} />
+                <Link href="/my-jobs" className="w-full">
+                    <Button
+                        variant="outline"
+                        className="w-full"
+                    >
+                        Back
+                    </Button>
+                </Link>
+
+            </div>
+
         </div>
     )
 }

@@ -29,7 +29,7 @@ export default async function Jobs() {
 
     const availableJobs = jobs.filter((job: Job) => job.freelanceId === null)
     return (
-        <div className="space-y-12">
+        <div className="space-y-12 py-24">
             <h1 className='text-3xl font-bold text-center'>Available Jobs</h1>
 
             <div className="flex flex-wrap gap-8">

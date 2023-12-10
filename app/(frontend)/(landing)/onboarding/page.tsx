@@ -6,7 +6,7 @@ import { authOptions } from "@/lib/auth"
 export default async function OnBoarding() {
     const session = await getServerSession(authOptions)
     return (
-        <div className="hidden space-y-6 md:block max-w-2/3 mx-auto mb-8">
+        <div className="hidden space-y-6 md:block max-w-2/3 mx-auto mb-8 py-24">
             <div className="space-y-0.5">
                 <h2 className="text-2xl font-bold tracking-tight">Welcome {(session?.user.name)?.split(" ")[0]} to DIS Graduation App</h2>
                 <p className="text-muted-foreground">

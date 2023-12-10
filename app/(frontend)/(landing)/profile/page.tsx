@@ -49,7 +49,7 @@ export default async function Profile() {
 
             <div>
                 {user.description ? (
-                    <div className="p-4 bg-secondary rounded-md grid grid-cols-8">
+                    <div className="p-4 bg-secondary rounded-md grid grid-cols-8 py-24">
                         <p className="text-muted-foreground col-span-7">{user.description}</p>
                         <DescriptionEdit user={user} />
                     </div>

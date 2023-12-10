@@ -5,7 +5,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
     return (
         <>
             <Navbar />
-            <main className='pt-8 px-44'>
+            <main className='px-44'>
                 {children}
             </main>
         </>

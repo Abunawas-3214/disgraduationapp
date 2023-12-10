@@ -72,7 +72,7 @@ export const POST = async (req: Request, { params }: { params: { id: string } })
                 freelanceId: body.freelanceId
             }
         })
-        console.log(res)
+
         return NextResponse.json({ message: "This job has been taken" }, { status: 200 });
     }
     return NextResponse.json({ message: "This job no longer available" }, { status: 409 });
@@ -165,15 +165,11 @@ export const PATCH = async (req: Request, { params }: { params: { id: string } }
             ...body.whatsapp && { whatsapp: String(body.whatsapp) },
             instagram: body.instagram,
             drive: body.drive,
-            ...body.freelance ? {
+            ...body.freelance && {
                 freelance: {
                     connect: {
                         id: body.freelance
                     }
-                }
-            } : {
-                freelance: {
-                    disconnect: true
                 }
             },
             status: body.status
