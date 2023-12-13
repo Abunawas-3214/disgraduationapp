@@ -9,6 +9,8 @@ import { jobSchema } from "./schema"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { DataTableViewOptions } from "./data-table-view-options"
 import AddJob from "./add-job"
+import { useContext } from "react"
+import { Context } from "@/components/context"
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>
@@ -16,7 +18,7 @@ interface DataTableToolbarProps<TData> {
 }
 export function DataTableToolbar<TData extends z.infer<typeof jobSchema>>({ table, data }: DataTableToolbarProps<TData>) {
 
-    const campuses = [...new Set(data.map((job) => job.campus))].slice().sort()
+    const { campuses } = useContext(Context)
     const sessions = [1, 2, 3]
     return (
         <div className="flex items-center justify-between">
@@ -61,7 +63,7 @@ export function DataTableToolbar<TData extends z.infer<typeof jobSchema>>({ tabl
                 )}
             </div>
             <DataTableViewOptions table={table} />
-            <AddJob campuses={campuses} />
+            <AddJob />
         </div>
     )
 }

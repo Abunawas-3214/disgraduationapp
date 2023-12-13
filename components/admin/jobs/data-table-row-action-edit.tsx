@@ -4,14 +4,14 @@ import axios from "axios"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
-import { SyntheticEvent, useContext, useState } from "react"
-import { format } from "date-fns"
+import { useContext, useState } from "react"
+import { Pencil } from "lucide-react"
 import { useForm, useFormState } from "react-hook-form"
-import { Plus, Calendar as CalendarIcon, Clock, MapPin } from "lucide-react"
 import { Icons } from "@/components/icons"
-import { CheckIcon } from "@radix-ui/react-icons"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { format } from "date-fns"
+import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons"
+import { Plus, Calendar as CalendarIcon, Clock, MapPin } from "lucide-react"
+import { Calendar } from "@/components/ui/calendar"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -31,12 +31,25 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { Calendar } from "@/components/ui/calendar"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+} from "@/components/ui/command"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -46,14 +59,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-} from "@/components/ui/command"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
+import { jobSchema } from "./schema"
 import { Context } from "@/components/context"
 
 const formSchema = z.object({
@@ -67,118 +76,140 @@ const formSchema = z.object({
         message: "Whatsapp must start with 62",
     }),
     instagram: z.string(),
-    drive: z.string().url().nullable(),
+    drive: z.string().url(),
+    freelanceId: z.string().optional(),
+    status: z.string(),
 })
 
-export default function AddJob() {
+export default function DataTableRowActionEdit({ job }: { job: z.infer<typeof jobSchema> }) {
     const [dialogOpen, setDialogOpen] = useState(false)
     const [isMutating, setIsMutating] = useState(false)
     const [campusSearch, setCampusSearch] = useState("")
-    const [generator, setGenerator] = useState("")
+    const [freelancerSearch, setFreelancerSearch] = useState("")
 
-    const { campuses } = useContext(Context)
-
+    const { campuses, freelancers } = useContext(Context)
+    console.log(job.freelanceId)
+    console.log(freelancers)
     const router = useRouter()
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         mode: "onChange",
+        defaultValues: {
+            name: job.name,
+            campus: job.campus,
+            date: job.date,
+            session: job.session.toString(),
+            whatsapp: job.whatsapp ?? "",
+            instagram: job.instagram ?? "",
+            drive: job.drive ?? "",
+            freelanceId: job.freelanceId ?? undefined,
+            status: job.status,
+        }
     })
 
     const { errors, isDirty } = useFormState({
         control: form.control
     })
 
-    const handleDialog = () => {
-        form.reset()
-        setDialogOpen(!dialogOpen)
-    }
-
-    const dirtyEachFields = () => {
-        const field = Object.values(form.watch())
-        return field.some(value => value === undefined || value === "")
-    }
-
-    const handleGenerate = async (e: SyntheticEvent) => {
-        e.preventDefault()
-
-        const namaRegex = /Nama : (\s*\w.*)/;
-        const namaKampusRegex = /Nama Kampus \/ Univ : (\w+)/;
-        const tanggalRegex = /Tanggal Wisuda : (\d{2}-\d{2}-\d{4})/;
-        const paketRegex = /Paket : (\w+)/;
-        const sesiRegex = /Sesi : Sesi (\d+)/;
-        const instagramRegex = /Instagram : @(\w+)/;
-
-        const namaMatch = generator.match(namaRegex);
-        const namaKampusMatch = generator.match(namaKampusRegex);
-        const tanggalMatch = generator.match(tanggalRegex);
-        const paketMatch = generator.match(paketRegex);
-        const sesiMatch = generator.match(sesiRegex);
-        const instagramMatch = generator.match(instagramRegex);
-
-        const namaValue = namaMatch ? namaMatch[1].trim() : null;
-        const namaKampusValue = namaKampusMatch ? namaKampusMatch[1] : null;
-        const tanggalValue = tanggalMatch ? new Date(tanggalMatch[1]) : null;
-        const paketValue = paketMatch ? paketMatch[1] : null;
-        const sesiValue = sesiMatch ? sesiMatch[1] : null;
-        const instagramValue = instagramMatch ? instagramMatch[1] : null;
-
-        form.setValue("name", namaValue ?? "")
-        form.setValue("campus", namaKampusValue ?? "")
-        form.setValue("date", tanggalValue ?? "")
-        form.setValue("session", sesiValue ?? "")
-        form.setValue("instagram", instagramValue ?? "")
-    }
-
-    const handleSubmit = async (e: SyntheticEvent) => {
-        e.preventDefault()
-        const data = {
-            ...form.getValues(),
-            date: new Date(form.getValues("date")).toISOString(),
-            session: Number(form.getValues("session"))
-        }
-        setIsMutating(true)
-        const res = await axios.post("http://localhost:3000/api/jobs", data)
-        setIsMutating(false)
-        handleDialog()
-        router.refresh()
-    }
-
     return (
-        <AlertDialog onOpenChange={handleDialog} open={dialogOpen}>
+        <AlertDialog>
             <AlertDialogTrigger asChild>
                 <Button
-                    variant="default"
-                    size="sm"
-                    className="ml-4 h-8 flex items-center gap-2"
+                    variant="ghost"
+                    className="flex h-8 w-8 p-0"
                 >
-                    <Plus className="h-4 w-4" />
-                    Add Job
+                    <Pencil className="h-4 w-4" />
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle className="text-xl font-bold">Add Job</AlertDialogTitle>
+                    <AlertDialogTitle>Edit Job for Client: {job.name}</AlertDialogTitle>
                 </AlertDialogHeader>
 
-                <div className="flex flex-col items-center gap-2">
-                    <Textarea placeholder="Input job template to generate" onChange={(e) => setGenerator(e.target.value)} />
-
-                    <Button className="w-fit" onClick={handleGenerate}>
-                        Generate
-                    </Button>
-                </div>
-
-
                 <Form {...form}>
+                    <FormField
+                        control={form.control}
+                        name="freelanceId"
+                        render={({ field }) => (
+                            <FormItem className="grid grid-cols-4 items-center gap-4">
+                                <FormLabel className="text-right">Freelance</FormLabel>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <FormControl>
+                                            <Button
+                                                disabled={isMutating}
+                                                variant="outline"
+                                                role="combobox"
+                                                className={cn(
+                                                    "w-full col-span-3 justify-between",
+                                                    !form.getFieldState("freelanceId").isDirty && "bg-secondary text-secondary-foreground/50",
+                                                    !field.value && "text-muted-foreground"
+                                                )}
+                                            >
+                                                {field.value ?
+                                                    freelancers.find((freelancer) => freelancer.id === field.value)?.name
+                                                    : ("Select Freelancer")}
+                                                {/* <MapPin className="ml-2 h-4 w-4 shrink-0 opacity-50" /> */}
+                                            </Button>
+                                        </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <Command>
+                                            <CommandInput placeholder="Search Campus" onValueChange={setFreelancerSearch} />
+                                            <CommandEmpty className="p-2 text-center">
+                                                No Freelancer Found
+                                            </CommandEmpty>
+                                            <CommandGroup heading="Freelancers">
+                                                {freelancers.map((freelancer) => (
+                                                    <CommandItem
+                                                        key={freelancer.id}
+                                                        onSelect={() => field.onChange(freelancer.id)}
+                                                    >
+                                                        {freelancer.name}
+                                                        <CheckIcon className={cn(
+                                                            "ml-auto h-4 w-4",
+                                                            freelancer.id === field.value
+                                                                ? "opacity-100"
+                                                                : "opacity-0"
+                                                        )}
+                                                        />
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                            <Separator />
+                                            <CommandGroup heading="Actions">
+                                                <CommandItem
+                                                    onSelect={() => {
+                                                        form.setValue("freelanceId", "")
+                                                    }}
+                                                >
+                                                    Set Job as Unassigned
+                                                    <Cross2Icon className={cn(
+                                                        "ml-auto h-4 w-4 opacity-50",
+                                                    )} />
+                                                </CommandItem>
+                                            </CommandGroup>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                                <FormMessage className="col-start-2 col-span-3" />
+                            </FormItem>
+                        )}
+                    />
                     <FormField
                         control={form.control}
                         name="name"
                         render={({ field }) => (
                             <FormItem className="grid grid-cols-4 items-center gap-4">
                                 <FormLabel className="text-right">Name</FormLabel>
-                                <FormControl >
-                                    <Input type="text" className="col-span-3" placeholder="Client's Name" {...field} disabled={isMutating} />
+                                <FormControl>
+                                    <Input
+                                        type="text"
+                                        className={`col-span-3 ${!form.getFieldState("name").isDirty && "bg-secondary text-secondary-foreground/50"} `}
+                                        placeholder="Name"
+                                        {...field}
+                                    />
                                 </FormControl>
                                 <FormMessage className="col-start-2 col-span-3" />
                             </FormItem>
@@ -199,6 +230,7 @@ export default function AddJob() {
                                                 role="combobox"
                                                 className={cn(
                                                     "w-full col-span-3 justify-between",
+                                                    !form.getFieldState("campus").isDirty && "bg-secondary text-secondary-foreground/50",
                                                     !field.value && "text-muted-foreground"
                                                 )}
                                             >
@@ -259,6 +291,7 @@ export default function AddJob() {
                                                 variant="outline"
                                                 className={cn(
                                                     "w-full col-span-3 justify-between",
+                                                    !form.getFieldState("date").isDirty && "bg-secondary text-secondary-foreground/50",
                                                     !field.value && "text-muted-foreground"
                                                 )}
                                             >
@@ -300,6 +333,7 @@ export default function AddJob() {
                                                 variant="outline"
                                                 className={cn(
                                                     "w-full col-span-3 justify-between",
+                                                    !form.getFieldState("session").isDirty && "bg-secondary text-secondary-foreground/50",
                                                     !field.value && "text-muted-foreground"
                                                 )}
                                             >
@@ -308,7 +342,7 @@ export default function AddJob() {
                                             </Button>
                                         </FormControl>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
+                                    <DropdownMenuContent align="start">
                                         <DropdownMenuRadioGroup value={field.value} onValueChange={field.onChange}>
                                             <DropdownMenuRadioItem value={'1'}>Session: 1</DropdownMenuRadioItem>
                                             <DropdownMenuRadioItem value={'2'}>Session: 2</DropdownMenuRadioItem>
@@ -325,9 +359,14 @@ export default function AddJob() {
                         name="whatsapp"
                         render={({ field }) => (
                             <FormItem className="grid grid-cols-4 items-center gap-4">
-                                <FormLabel className="text-right">WhatsApp</FormLabel>
-                                <FormControl >
-                                    <Input type="number" className="col-span-3" placeholder="6200000" {...field} disabled={isMutating} />
+                                <FormLabel className="text-right">Whatsapp</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="text"
+                                        className={`col-span-3 ${!form.getFieldState("whatsapp").isDirty && "bg-secondary text-secondary-foreground/50"} `}
+                                        placeholder="Name"
+                                        {...field}
+                                    />
                                 </FormControl>
                                 <FormMessage className="col-start-2 col-span-3" />
                             </FormItem>
@@ -339,8 +378,31 @@ export default function AddJob() {
                         render={({ field }) => (
                             <FormItem className="grid grid-cols-4 items-center gap-4">
                                 <FormLabel className="text-right">Instagram</FormLabel>
-                                <FormControl >
-                                    <Input type="text" className="col-span-3" placeholder="disgradution" {...field} disabled={isMutating} />
+                                <FormControl>
+                                    <Input
+                                        type="text"
+                                        className={`col-span-3 ${!form.getFieldState("instagram").isDirty && "bg-secondary text-secondary-foreground/50"} `}
+                                        placeholder="Name"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage className="col-start-2 col-span-3" />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="drive"
+                        render={({ field }) => (
+                            <FormItem className="grid grid-cols-4 items-center gap-4">
+                                <FormLabel className="text-right">Drive Link</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="text"
+                                        className={`col-span-3 ${!form.getFieldState("drive").isDirty && "bg-secondary text-secondary-foreground/50"} `}
+                                        placeholder="Insert Google Drive Link Here"
+                                        {...field}
+                                    />
                                 </FormControl>
                                 <FormMessage className="col-start-2 col-span-3" />
                             </FormItem>
@@ -350,22 +412,9 @@ export default function AddJob() {
 
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <Button
-                        onClick={handleSubmit}
-                        disabled={!isDirty || Object.keys(errors).length > 0 || dirtyEachFields() || isMutating}
-                    >
-                        {isMutating ? (
-                            <>
-                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                                <span>Saving...</span>
-                            </>
-                        ) : (
-                            <span>Save</span>
-                        )}
-                    </Button>
+                    <AlertDialogAction>Submit</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
-
     )
 }

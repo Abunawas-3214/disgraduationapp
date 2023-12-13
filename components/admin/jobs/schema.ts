@@ -10,6 +10,7 @@ export const jobSchema = z.object({
     instagram: z.string().nullable(),
     drive: z.string().url().nullable(),
     freelance: z.string().nullable(),
+    freelanceId: z.string().nullable(),
     status: z.string()
 })
 

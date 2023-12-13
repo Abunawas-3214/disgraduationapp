@@ -5,6 +5,8 @@ import { Eye, Pencil, Trash, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import DataTableRowActionView from "./data-table-row-action-view"
 import DataTableRowActionComplete from "./data-table-row-action-complete"
+import DataTableRowActionDelete from "./data-table-row-action-delete"
+import DataTableRowActionEdit from "./data-table-row-action-edit"
 
 interface DataTableRowActionsProps<TData> {
     row: Row<TData>
@@ -15,18 +17,8 @@ export function DataTableRowActions<TData>({ row }: DataTableRowActionsProps<TDa
     return (
         <div className="flex items-center">
             <DataTableRowActionView job={job} />
-            <Button
-                variant="ghost"
-                className="flex w-8 h-8 p-0"
-            >
-                <Pencil className="w-4 h-4" />
-            </Button>
-            <Button
-                variant="ghost"
-                className="flex w-8 h-8 p-0"
-            >
-                <Trash className="w-4 h-4" />
-            </Button>
+            <DataTableRowActionEdit job={job} />
+            <DataTableRowActionDelete job={job} />
             <DataTableRowActionComplete job={job} />
         </div>
     )

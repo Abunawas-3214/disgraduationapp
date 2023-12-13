@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 import { signIn, signOut, useSession } from "next-auth/react"
+import { Session } from "inspector"
 
 export default function UserNav() {
     const { data: session } = useSession()
@@ -51,12 +52,14 @@ export default function UserNav() {
                 <DropdownMenuGroup>
                     {(session.user.level === "ADMIN") &&
                         <Link href={"/admin"}>
-                            <DropdownMenuItem>Admin</DropdownMenuItem>
+                            <DropdownMenuItem>Dashboard</DropdownMenuItem>
                         </Link>
                     }
-                    <Link href={"/profile"}>
-                        <DropdownMenuItem>Profile</DropdownMenuItem>
-                    </Link>
+                    {(session.user.level !== "ADMIN") &&
+                        <Link href={"/profile"}>
+                            <DropdownMenuItem>Profile</DropdownMenuItem>
+                        </Link>
+                    }
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut()}>Log Out</DropdownMenuItem>

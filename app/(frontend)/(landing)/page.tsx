@@ -13,18 +13,19 @@ export default async function Home() {
         <h1 className="text-7xl font-extrabold">DISGRADUATION APP</h1>
         <p className="text-xl text-primary opacity-50 font-normal mt-24">The ultimate platform crafted solely for graduation Photographers. Seamlessly connecting Photographers with potential clients, our user-friendly interface enables professionals to bid on job listings, manage bookings, and communicate effortlessly. Elevate your photography career with Disgraduation, your dedicated portal for capturing unforgettable graduation moments.</p>
         <div className="flex gap-4 mt-12 justify-center">
-          {session?.user.status === "APPROVED" ? (
-            <Link href="/jobs">
-              <Button
-                size="lg"
-              >
-                Find Job
-              </Button>
-            </Link>
+          {session?.user.level !== "ADMIN" && (
+            session?.user.status === "APPROVED" ? (
+              <Link href="/jobs">
+                <Button
+                  size="lg"
+                >
+                  Find Job
+                </Button>
+              </Link>
 
-          ) : (
-            <RegisterButton />
-          )}
+            ) : (
+              <RegisterButton />
+            ))}
 
           <Button
             variant="outline"

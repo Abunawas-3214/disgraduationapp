@@ -1,6 +1,6 @@
 'use client'
 import { z } from "zod"
-import { useState } from "react"
+import { useContext, useState } from "react"
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -26,17 +26,38 @@ import {
 import { DataTableToolbar } from "./data-table-toolbar"
 
 import { jobSchema } from "./schema"
+import { Context } from "@/components/context"
+
+type freelance = {
+    id: string,
+    name: string,
+    email: string,
+    whatsapp: string,
+    instagram: string,
+    price: number,
+    address: string,
+    description: string | null,
+    status: string,
+    bankAgency: string | null,
+    bankNumber: string | null,
+}
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    campuses: string[]
+    freelancers: freelance[]
 }
 
-export function DataTable<TData extends z.infer<typeof jobSchema>, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable<TData extends z.infer<typeof jobSchema>, TValue>({ columns, data, campuses, freelancers }: DataTableProps<TData, TValue>) {
     const [rowSelection, setRowSelection] = useState({})
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [sorting, setSorting] = useState<SortingState>([])
+
+    const { setCampuses, setFreelancers } = useContext(Context)
+    setCampuses(campuses)
+    setFreelancers(freelancers)
 
     const table = useReactTable({
         data,
